@@ -16,7 +16,7 @@ class @ScrollAnimation
     scrollTop = document.documentElement.scrollTop or document.body.scrollTop
     return if scrollTop is lastTop
     for anim in ScrollAnimation.animations
-      anim?.animate(scrollTop, windowHeight, documentHeight)
+      anim?.animate(scrollTop, windowHeight, documentHeight, lastTop)
 
     lastTop = scrollTop
 
@@ -70,7 +70,7 @@ class @ScrollAnimation
     @height = @el.offsetHeight
     @end = @height + @start
 
-  animate: (scrollTop, windowHeight, documentHeight) ->
+  animate: (scrollTop, windowHeight, documentHeight, lastTop) ->
     unless (@start > scrollTop && @end < (scrollTop + windowHeight))
       if @state == STATE_ANIMATING
         @reset?()
