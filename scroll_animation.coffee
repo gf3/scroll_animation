@@ -85,9 +85,12 @@ class @ScrollAnimation
   STATE_IDLE = 0
   STATE_ANIMATING = 1
 
-  constructor: ({@el, @animation, @reset, offset}) ->
-    @offset = offset || -> 0
+  constructor: (options = {}) ->
+    @offset = options.offset || -> 0
     offset = @offset(windowHeight)
+    delete options.offset
+
+    this[key] = value for own key, value of options
 
     @resize(windowHeight)
     @state = STATE_IDLE
