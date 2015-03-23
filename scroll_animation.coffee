@@ -67,7 +67,7 @@ class @ScrollAnimation
     ScrollAnimation.refresh()
     $(window).on("resize", ScrollAnimation.refresh)
 
-    if Modernizr?.touch
+    if "ontouchstart" in window
       document.addEventListener("touchstart", update)
       document.addEventListener("touchmove", update)
       document.addEventListener("touchend", update)
