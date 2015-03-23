@@ -1,23 +1,51 @@
-window.requestAnimationFrame = (->
-  return  window.requestAnimationFrame       ||
-          window.webkitRequestAnimationFrame ||
-          window.mozRequestAnimationFrame    ||
-          window.oRequestAnimationFrame      ||
-          window.msRequestAnimationFrame     ||
-          (callback) -> window.setTimeout(callback, 1000 / 60)
-)()
+requestAnimationFrame = do ->
+  window.requestAnimationFrame       ||
+  window.webkitRequestAnimationFrame ||
+  window.mozRequestAnimationFrame    ||
+  window.oRequestAnimationFrame      ||
+  window.msRequestAnimationFrame     ||
+  (callback) -> window.setTimeout(callback, 1000 / 60)
+
+
+SCROLL_ELEMENT = null
+FT_SCROLL_ELEMENT = ->
+  bak =
+    des: document.documentElement.style.cssText
+    bs:  document.body.style.cssText
+  document.body.insertBefore((div = document.createElement('div')), document.body.firstChild)
+
+  document.body.style.margin = document.documentElement.style.margin = '0'
+  document.body.style.height = document.documentElement.style.height = 'auto'
+  div.style.cssText = 'display:block;height:99999px;'
+
+  scrollTop = document.documentElement.scrollTop
+  scrollElement =
+    if ++document.documentElement.scrollTop && document.documentElement.scrollTop == scrollTop + 1
+      document.documentElement
+    else
+      document.body
+
+  document.body.removeChild(div)
+  document.documentElement.style.cssText = bak.des
+  document.body.style.cssText = bak.bs
+
+  SCROLL_ELEMENT = scrollElement
+
+if document.body
+  FT_SCROLL_ELEMENT()
+else
+  $ FT_SCROLL_ELEMENT
 
 class @ScrollAnimation
-  windowHeight   = window.innerHeight
-  documentHeight = null
-  lastTop        = null
+  windowHeight   = NaN
+  documentHeight = NaN
+  lastTop        = NaN
 
   update = ->
-    scrollTop = document.documentElement.scrollTop or document.body.scrollTop
+    scrollTop = SCROLL_ELEMENT.scrollTop
     return if scrollTop is lastTop
     for anim in ScrollAnimation.animations
       anim?.animate(scrollTop, windowHeight, documentHeight, lastTop)
-
     lastTop = scrollTop
 
   run = ->
@@ -47,11 +75,8 @@ class @ScrollAnimation
     run()
 
   @refresh: ->
-    body = document.body
-    html = document.documentElement
-
-    windowHeight   = window.innerHeight
-    documentHeight = Math.max(body.scrollHeight, body.offsetHeight, body.clientHeight, html.clientHeight, html.scrollHeight, html.offsetHeight)
+    windowHeight   = SCROLL_ELEMENT.clientHeight
+    documentHeight = SCROLL_ELEMENT.scrollHeight
     lastTop        = 0
 
     anim.resize() for anim in ScrollAnimation.animations
